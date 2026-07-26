@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "sync-assets": "node scripts/sync-assets.cjs",
+    "update-data": "python scripts/update_after_crawl.py",
     "dev": "npm run sync-assets && vite --host 127.0.0.1",
     "build": "npm run sync-assets && vite build",
     "preview": "vite preview --host 127.0.0.1"

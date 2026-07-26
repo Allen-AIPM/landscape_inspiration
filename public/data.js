@@ -863,6 +863,66 @@ window.inspirationItems = [
     "comment_count": 0
   },
   {
+    "id": "074c6629e8fb771b",
+    "title": "vait-谢柯老师为演员胡军设计的私宅沉稳大气",
+    "file_name": "vait-谢柯老师为演员胡军设计的私宅沉稳大气.jpeg",
+    "relative_path": "小红书素材爬取/vait-谢柯老师为演员胡军设计的私宅沉稳大气.jpeg",
+    "image_url": "./小红书素材爬取/vait-谢柯老师为演员胡军设计的私宅沉稳大气.jpeg",
+    "source_platform": "",
+    "source_user": "",
+    "crawl_time": "",
+    "source_title": "",
+    "source_url": "",
+    "source_image_url": "",
+    "like_count": 0,
+    "collect_count": 0,
+    "comment_count": 0,
+    "excel_matched": false,
+    "category": "风景园林",
+    "landscape_type": "居住区景观",
+    "image_type": "实景照片",
+    "style_tags": [
+      "现代风格",
+      "极简风格"
+    ],
+    "material_tags": [
+      "木材",
+      "石材",
+      "植物材料"
+    ],
+    "color_tags": [
+      "绿色",
+      "木色",
+      "灰色"
+    ],
+    "space_tags": [
+      "半开放空间"
+    ],
+    "element_tags": [
+      "植物",
+      "铺装",
+      "家具设施",
+      "照明"
+    ],
+    "keywords": [
+      "庭院设计",
+      "户外客厅",
+      "自然采光",
+      "木质顶棚",
+      "绿植环绕",
+      "现代休闲空间"
+    ],
+    "ai_description": "该图片展示了一个现代风格的居住区庭院空间，采用木质顶棚与大面积玻璃围合形成半开放空间，搭配石材地面和绿植背景，营造出宁静舒适的户外休闲氛围。整体以木材、石材和植物为主要材料，体现极简与自然生态的设计理念。",
+    "confidence": 0.92,
+    "need_review": false,
+    "tagging_status": "success",
+    "tagging_error": "",
+    "favorite": false,
+    "liked": false,
+    "created_at": "2026-07-26T11:01:50.980291",
+    "updated_at": "2026-07-26T11:01:50.980291"
+  },
+  {
     "id": "0ffaddb8c049f9fc",
     "title": "一方庭院-案例分享160托马索德尔布奥诺切尔西2014",
     "file_name": "一方庭院-案例分享160托马索德尔布奥诺切尔西2014.jpeg",
@@ -3493,6 +3553,68 @@ window.inspirationItems = [
     "like_count": 15,
     "collect_count": 2,
     "comment_count": 0
+  },
+  {
+    "id": "055c97d0d98a3618",
+    "title": "阿木Amoon-设计探访阿那亚广州",
+    "file_name": "阿木Amoon-设计探访阿那亚广州.jpeg",
+    "relative_path": "小红书素材爬取/阿木Amoon-设计探访阿那亚广州.jpeg",
+    "image_url": "./小红书素材爬取/阿木Amoon-设计探访阿那亚广州.jpeg",
+    "source_platform": "",
+    "source_user": "",
+    "crawl_time": "",
+    "source_title": "",
+    "source_url": "",
+    "source_image_url": "",
+    "like_count": 0,
+    "collect_count": 0,
+    "comment_count": 0,
+    "excel_matched": false,
+    "category": "风景园林",
+    "landscape_type": "居住区景观",
+    "image_type": "实景照片",
+    "style_tags": [
+      "现代风格",
+      "极简风格"
+    ],
+    "material_tags": [
+      "砖材",
+      "金属",
+      "铺装材料",
+      "植物材料"
+    ],
+    "color_tags": [
+      "绿色",
+      "白色",
+      "木色"
+    ],
+    "space_tags": [
+      "开放空间",
+      "半开放空间"
+    ],
+    "element_tags": [
+      "植物",
+      "铺装",
+      "园路",
+      "景观小品"
+    ],
+    "keywords": [
+      "住宅区绿化",
+      "现代建筑景观",
+      "庭院设计",
+      "绿植搭配",
+      "遮阳结构",
+      "社区环境"
+    ],
+    "ai_description": "该图片展示了一个现代风格的居住区景观，以绿色草坪、整齐铺装和木质遮阳结构为主要特征，结合砖墙与金属支撑形成半开放空间，体现简洁而实用的设计理念，适合用于住宅区公共空间参考。",
+    "confidence": 0.9,
+    "need_review": false,
+    "tagging_status": "success",
+    "tagging_error": "",
+    "favorite": false,
+    "liked": false,
+    "created_at": "2026-07-26T11:01:50.980291",
+    "updated_at": "2026-07-26T11:01:50.980291"
   },
   {
     "id": "328098bee6b5c860",
