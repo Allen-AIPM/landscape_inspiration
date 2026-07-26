@@ -258,6 +258,30 @@ def title_from_filename(filename):
     return combined if combined else filename
 
 
+def fallback_source_from_filename(filename):
+    """Excel 未匹配时，从文件名兜底提取来源用户名和标题。"""
+    name = os.path.splitext(filename)[0].strip()
+    parts = name.split("-", 1)
+    if len(parts) == 2:
+        source_user = parts[0].strip()
+        source_title = parts[1].strip()
+    else:
+        source_user = ""
+        source_title = name
+
+    return {
+        "source_platform": "小红书",
+        "source_user": source_user,
+        "crawl_time": "",
+        "source_title": source_title,
+        "source_url": "",
+        "source_image_url": "",
+        "like_count": 0,
+        "collect_count": 0,
+        "comment_count": 0,
+    }
+
+
 def should_update_title(existing_title, new_title, source_user, source_title, filename):
     """判断是否应该用新标题覆盖已有 title。
 
@@ -494,7 +518,7 @@ def match_by_user_title(row, images, matched_paths):
     """
     user = normalize_for_match(row.get("source_user", ""))
     title = normalize_for_match(row.get("source_title", ""))
-    if not user:
+    if not user and not title:
         return None
 
     for img in images:
@@ -510,27 +534,41 @@ def match_by_user_title(row, images, matched_paths):
             file_user = normalize_for_match(stem)
             file_title = ""
 
-        # 用户名匹配
-        if not file_user:
-            continue
-        user_match = (
-            file_user == user
-            or file_user.startswith(user)
-            or user.startswith(file_user)
-        )
-        if not user_match:
-            continue
+        full_stem = normalize_for_match(stem)
 
-        # 标题匹配
-        if not title or not file_title:
-            # 标题为空时仅凭用户名匹配
+        user_match = bool(
+            user and file_user and (
+                file_user == user
+                or file_user.startswith(user)
+                or user.startswith(file_user)
+            )
+        )
+
+        title_match = False
+        if title and file_title:
+            # 标题前缀匹配（取较短的前8个字符比较，因为文件名可能被截断）
+            min_len = min(len(title), len(file_title), 8)
+            title_match = (
+                (min_len > 0 and title[:min_len] == file_title[:min_len])
+                or title in file_title
+                or file_title in title
+            )
+        elif title and full_stem:
+            # 有些影刀文件名会改写用户名，只保留较可靠的标题信息。
+            min_len = min(len(title), len(full_stem), 8)
+            title_match = (
+                (min_len > 0 and title[:min_len] in full_stem)
+                or title in full_stem
+                or full_stem in title
+            )
+
+        if user_match and (not title or not file_title or title_match):
             return img
-        # 标题前缀匹配（取较短的前8个字符比较，因为文件名可能被截断）
-        min_len = min(len(title), len(file_title), 8)
-        if min_len > 0 and title[:min_len] == file_title[:min_len]:
-            return img
-        # 标题互相包含
-        if title in file_title or file_title in title:
+
+        # 用户名被清洗/截断时，允许用标题单独匹配。
+        # 例如文件名 "vait-谢柯老师为演员胡军设计的私宅沉稳大气.jpeg"
+        # 对应 Excel 用户名 "🌸 vaśitā"，但标题一致。
+        if title_match:
             return img
 
     return None
@@ -850,6 +888,7 @@ def generate():
         current_ids.add(item_id)
         existing = existing_map.get(item_id)
         auto_title = title_from_filename(img["file_name"])
+        fallback_source = fallback_source_from_filename(img["file_name"])
 
         if existing:
             # 增量更新：保留已有数据
@@ -863,17 +902,9 @@ def generate():
             item["excel_matched"] = False
 
             # 如果是 Excel 读取失败（skip_excel），保留已有来源字段不清空
-            # 如果是正常未匹配，来源字段使用默认空值
+            # 如果是正常未匹配，来源字段使用文件名兜底
             if not skip_excel:
-                item["source_platform"] = ""
-                item["source_user"] = ""
-                item["crawl_time"] = ""
-                item["source_title"] = ""
-                item["source_url"] = ""
-                item["source_image_url"] = ""
-                item["like_count"] = 0
-                item["collect_count"] = 0
-                item["comment_count"] = 0
+                item.update(fallback_source)
 
             # 保留已有 title，若标题缺失或属于旧版自动生成则更新
             if should_update_title(item.get("title"), auto_title, "", "", img["file_name"]):
@@ -898,15 +929,7 @@ def generate():
                 "file_name":        img["file_name"],
                 "relative_path":    img["relative_path"],
                 "image_url":        img["image_url"],
-                "source_platform":  "",
-                "source_user":      "",
-                "crawl_time":       "",
-                "source_title":     "",
-                "source_url":       "",
-                "source_image_url": "",
-                "like_count":       0,
-                "collect_count":    0,
-                "comment_count":    0,
+                **fallback_source,
                 "excel_matched":    False,
                 "category":         "风景园林",
                 "landscape_type":   "",
@@ -944,6 +967,17 @@ def generate():
     # 7. 生成匹配报告
     report = {
         "generated_at": now,
+        "summary": {
+            "total_local_images": stats["total_local_images"],
+            "excel_valid_rows": stats["excel_valid_rows"],
+            "matched_count": stats["matched_count"],
+            "unmatched_local_count": stats["unmatched_local_count"],
+            "unmatched_excel_count": stats["unmatched_excel_count"],
+            "new_count": stats["new_count"],
+            "updated_count": stats["updated_count"],
+            "preserved_ai_count": stats["preserved_ai_count"],
+            "removed_count": stats["removed_count"],
+        },
         "matched_items": [
             {
                 "file_name":        img["file_name"],

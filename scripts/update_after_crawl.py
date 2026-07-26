@@ -18,6 +18,7 @@ update_after_crawl.py - 影刀爬取后网站一键更新脚本
 """
 
 import argparse
+import json
 import os
 import subprocess
 import sys
@@ -52,6 +53,55 @@ def build_ai_args(args):
     return ai_args
 
 
+def print_match_report():
+    report_path = os.path.join(PROJECT_ROOT, "public", "match_report.json")
+    if not os.path.isfile(report_path):
+        print("\n[提醒] 未找到匹配报告：%s" % report_path)
+        return
+
+    try:
+        with open(report_path, "r", encoding="utf-8") as f:
+            report = json.load(f)
+    except Exception as e:
+        print("\n[提醒] 匹配报告读取失败：%s" % e)
+        return
+
+    summary = report.get("summary", {})
+    unmatched_local = report.get("unmatched_local_images", [])
+    unmatched_excel = report.get("unmatched_excel_rows", [])
+
+    print("\n" + "=" * 72)
+    print("数据同步检查")
+    print("=" * 72)
+    if summary:
+        print("本地图片：%s 张" % summary.get("total_local_images", 0))
+        print("Excel 有效行：%s 行" % summary.get("excel_valid_rows", 0))
+        print("成功匹配：%s 条" % summary.get("matched_count", 0))
+        print("未匹配图片：%s 张" % summary.get("unmatched_local_count", len(unmatched_local)))
+        print("未匹配 Excel 行：%s 行" % summary.get("unmatched_excel_count", len(unmatched_excel)))
+
+    if unmatched_local:
+        print("\n[需要确认] 下面这些图片没有匹配到 Excel 行，网站会先使用文件名兜底显示：")
+        for item in unmatched_local[:20]:
+            print("  - %s" % item.get("file_name", ""))
+        if len(unmatched_local) > 20:
+            print("  ... 还有 %s 张" % (len(unmatched_local) - 20))
+        print("请确认 data_sources\\数据储存.xlsx 是否是影刀最新导出的文件。")
+    else:
+        print("\n[正常] 本地图片已经全部匹配到 Excel。")
+
+    if unmatched_excel:
+        print("\n[需要确认] Excel 中有记录没有匹配到本地图片：")
+        for item in unmatched_excel[:20]:
+            print("  - 第 %s 行：%s - %s" % (
+                item.get("row_index", ""),
+                item.get("source_user", ""),
+                item.get("source_title", ""),
+            ))
+        if len(unmatched_excel) > 20:
+            print("  ... 还有 %s 行" % (len(unmatched_excel) - 20))
+
+
 def main():
     parser = argparse.ArgumentParser(description="影刀爬取后，一键生成数据、AI 打标并刷新网站数据。")
     parser.add_argument("--limit", type=int, default=0, help="限制本次 AI 打标图片数量，例如 --limit 5")
@@ -77,6 +127,7 @@ def main():
         run_step("第 2 步：AI 打标待处理图片", [python, ai_script] + build_ai_args(args))
 
     run_step("第 3 步：收尾同步数据，保留 AI 打标结果", [python, generate_script])
+    print_match_report()
 
     print("\n" + "=" * 72)
     print("完成：网站数据已更新。")
